@@ -1,0 +1,126 @@
+<html>
+<head>
+<meta charset="utf-8">
+<title>Auvergne 2030</title>
+<style>
+@import url(d3.parsets.css);
+
+body {
+  font-family: sans-serif;
+  font-size: 16px;
+  width: 2000px;
+  margin: 0.1em auto;
+  position: relative;
+}
+footer {
+  height: 100px;
+}
+h1, .dimension text {
+  text-align: center;
+  font-family: "lucida sans","PT Sans", Helvetica;
+  font-weight: 900;
+}
+h1 {
+  font-size: 2.5em;
+  margin: .5em 0 0 0;
+  color: #000000;
+}
+label {
+  position: initial;
+  top: 10px;
+
+}
+
+</style>
+</head>
+<body>
+<h1>Auvergne 2030</h1>
+
+<div id="option">
+  <input name="updateButton"
+           type="button"
+           value="Update"
+           onclick="updateData()" />
+</div>
+<aside>
+
+</aside>
+<div id="vis"><noscript></noscript></div>
+
+<script src="https://d3js.org/d3.v3.js"></script>
+<script src="d3.parsets.js"></script>
+<script src="highlight.min.js"></script>
+
+<script>
+
+var dimensions = [];
+d3.csv("data4.csv", function(csv) {
+
+    var select = d3.select('aside')
+                    .append("g")
+
+      var choices = [],
+        data = Object.keys(csv[0]);
+
+
+    var options = select
+          .selectAll('input')
+          .data(data).enter()
+          .append('li')
+          .append('label')
+          .append("input")
+          .attr("type","checkbox")
+          .attr("class","myCheckbox")
+          .attr("id", function(d,i) { return 'a'+i; })
+          .property("value", function(d) { return d})
+          .on("change", update);
+
+          d3.selectAll("label")
+                  .append("text")
+                  .text(function(d) { return d; })
+
+          var button = d3.selectAll('button')
+                          .append("button");
+
+          update ();
+
+          function update () {
+                    var type = this.value;
+                    if(this.checked) {
+                      var choices = data.filter(function(data){return data == type;});
+                      dimensions = dimensions.concat(choices);
+                    }
+
+                    else {
+                      dimensions = dimensions.filter(function(data){return data != type;});
+                    }
+
+                      console.log(dimensions);
+                      chart.dimensions(dimensions);
+                  };
+
+
+  })
+
+
+  var chart = d3.parsets()
+      .dimensions(dimensions)
+      .width(1500)
+      .height(1000);
+
+  var vis = d3.select("#vis").append("svg")
+      .attr("width", chart.width())
+      .attr("height", chart.height());
+
+function updateData () {
+d3.csv("data4.csv", function(csv) {
+    vis.datum(csv).call(chart);
+
+});}
+
+</script>
+</body>
+<footer>
+
+</footer>
+</html>
